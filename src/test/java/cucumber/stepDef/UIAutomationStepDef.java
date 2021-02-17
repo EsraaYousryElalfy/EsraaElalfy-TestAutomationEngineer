@@ -8,16 +8,15 @@ import io.cucumber.java.en.When;
 import org.testng.Assert;
 import selenium.pages.*;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class UIAutomationStepDef {
     public static String customerID;
+    public static String accountNumber;
     private final static String firstName = new Faker().name().firstName();
     private final static String lastName = new Faker().name().lastName();
-    private final static String postCode =new Faker().numerify("#####");
+    private final static String postCode = new Faker().numerify("#####");
 
 
     @Given("The User in the protector anglarjs")
@@ -48,7 +47,6 @@ public class UIAutomationStepDef {
     @And("Fill all customer fields")
     public void fillAllCustomerFields() {
         AddCustomerPage addCustomerPage = new AddCustomerPage();
-        Faker faker = new Faker();
         addCustomerPage.enterFirstName(firstName);
         addCustomerPage.enterLastName(lastName);
         addCustomerPage.enterPostCode(postCode);
@@ -79,14 +77,15 @@ public class UIAutomationStepDef {
         bankManagerPage.openCustomersPage();
     }
 
-    @Then("the user displayed in the same order and the data displayed correctly")
+    @Then("the user displayed in the same order abd the data displayed correctly")
     public void theUserOrderInTheListIsTheSameAsTheValueRetrievedFromTheAlert() {
         CustomersPage customersPage = new CustomersPage();
         Map<String, String> customerData = customersPage.getAllCustomers(customerID);
-        Assert.assertTrue(customerData.containsValue(firstName));
-        Assert.assertTrue(customerData.containsValue(lastName));
-        Assert.assertTrue(customerData.containsValue(postCode));
+        Assert.assertTrue(customerData.containsValue(firstName), "First name not displayed for added user");
+        Assert.assertTrue(customerData.containsValue(lastName), "last name not displayed for added user");
+        Assert.assertTrue(customerData.containsValue(postCode), "post code not displayed for added user");
     }
+
 
     @Given("The User in XYZ Bank Page and click on open account")
     public void theUserInXYZBankPageAndClickOnOpenAccount() {
@@ -96,11 +95,17 @@ public class UIAutomationStepDef {
 
     @When("Select the customer entered in the ScenarioOne and select a random currency and Submit account by clicking on Process Button")
     public void selectTheCustomerEnteredInTheScenarioOneAndSelectARandomCurrencyAndSubmitAccountByClickingOnProcessButton() {
-
+        OpenAccountPage openAccountPage = new OpenAccountPage();
+        openAccountPage.selectCustomer(firstName + " " + lastName);
+        openAccountPage.selectCurrency();
+        openAccountPage.clickOnProcess();
     }
 
     @And("Get the Account Number from the Alert then close the alert")
     public void getTheAccountNumberFromTheAlertThenCloseTheAlert() {
+        OpenAccountPage openAccountPage = new OpenAccountPage();
+        accountNumber = openAccountPage.getNumberFromAlert();
+        openAccountPage.dismissTheAlert();
     }
 
     @And("Click on Customers")
@@ -109,9 +114,11 @@ public class UIAutomationStepDef {
         bankManagerPage.openCustomersPage();
     }
 
-    @Then("Assert that the Account Number retrieved from the alert is displayed in its cell for the created customer")
+    @Then("the Account Number retrieved from the alert is displayed in its cell for the created customer")
     public void assertThatTheAccountNumberRetrievedFromTheAlertIsDisplayedInItsCellForTheCreatedCustomer() {
-//        Assert.assertTrue();
+        CustomersPage customersPage = new CustomersPage();
+        Map<String, String> customerData = customersPage.getAllCustomers(customerID);
+        Assert.assertTrue(customerData.containsValue(accountNumber), "Account number not displayed correctly");
     }
 
     @Given("The User in XYZ Bank Customers Tab")
@@ -123,11 +130,23 @@ public class UIAutomationStepDef {
     @When("Click on Delete for the created customer in the scenarioOne")
     public void clickOnDeleteForTheCreatedCustomerInTheScenarioOne() {
         CustomersPage customersPage = new CustomersPage();
+        customersPage.searchAboutCustomer(firstName);
         customersPage.deleteAccount();
     }
 
-    @Then("Assert that the customer is no longer found in the customers' table")
+    @Then("the customer is no longer found in the customers table")
     public void assertThatTheCustomerIsNoLongerFoundInTheCustomersTable() {
-//        Assert.assertTrue();
+        CustomersPage customersPage = new CustomersPage();
+        customersPage.searchAboutCustomer("");
+        List<Map<String,String>>  customers =customersPage.getAllCustomers();
+        Assert.assertTrue(customers.stream().noneMatch(map->map.containsValue(firstName)), "The user not deleted");
+        Assert.assertTrue(customers.stream().noneMatch(map->map.containsValue(lastName)), "The user not deleted");
+        Assert.assertTrue(customers.stream().noneMatch(map->map.containsValue(postCode)), "The user not deleted");
+    }
+
+    @And("user Clicks on open account")
+    public void userClicksOnOpenAccount() {
+        BankManagerPage bankManagerPage = new BankManagerPage();
+        bankManagerPage.openAccountPage();
     }
 }

@@ -1,18 +1,18 @@
 package restassured.utils;
 
 import constants.EndPoints;
-import org.openqa.selenium.By;
 
 public enum ApiUri implements EndPoints {
+    Market_Place_URI("marketplace")
     ;
 
-    private String uri;
+    private String endPoint;
 
-    ApiUri (String uri) {
-        this.uri =uri;
+    ApiUri(String endPoint) {
+        this.endPoint =endPoint;
     }
     @Override
     public String uri() {
-        return uri;
+        return endPoint;
     }
 }

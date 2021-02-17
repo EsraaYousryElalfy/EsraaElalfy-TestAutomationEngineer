@@ -9,14 +9,17 @@ public class AddCustomerPage extends GlobalHooks {
 
 
     public void enterFirstName(String firstName) {
-        SeleniumWebDriver.sendKeys(First_Name.by(),firstName);
+        SeleniumWebDriver.sendKeys(First_Name.by(), firstName);
     }
+
     public void enterLastName(String lastName) {
-        SeleniumWebDriver.sendKeys(Last_Name.by(),lastName);
+        SeleniumWebDriver.sendKeys(Last_Name.by(), lastName);
     }
+
     public void enterPostCode(String postCode) {
-        SeleniumWebDriver.sendKeys(Post_Code.by(),postCode);
+        SeleniumWebDriver.sendKeys(Post_Code.by(), postCode);
     }
+
     public void clickAddCustomerButton() {
         SeleniumWebDriver.clickOn(Add_Customer.by());
     }
